@@ -52,7 +52,7 @@
               <i class="material-icons right">edit</i>Изменить
             </button>
             <button
-              @click="saveItemEdit(item.id, item.title, item.description, item.price)"
+              @click="saveItemEdit({id: item.id, title: item.title, description: item.description, price: item.price})"
               v-show="item.id === editedItem"
               class="waves-effect waves-light btn-small edit-btn">
               <i class="material-icons right">save</i>Сохранить
@@ -156,16 +156,9 @@
         this.editedItem = item;
         console.log(item)
       },
-      saveItemEdit(id, title, description, price) {
-        let updatedItem = {
-          title,
-          description,
-          price
-        }
-        this.updateItem(id, updatedItem);
-        console.log(updatedItem)
+      saveItemEdit(payload) {
+        this.updateItem(payload);
         this.editedItem = false;
-
       }
     },
   }

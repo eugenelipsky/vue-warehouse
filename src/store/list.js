@@ -6,7 +6,9 @@ export default {
       await firestore().collection("list")
         .onSnapshot(function (querySnapshot) {
           let list = [];
+          console.log(querySnapshot)
           querySnapshot.forEach(function (doc) {
+            console.log(doc)
             list.push(doc.data());
           })
           commit('setStoreItems', list)
@@ -30,9 +32,8 @@ export default {
         console.log(state.list)
       })
     },
-    updateItem(state, id, updatedItem) {
-      console.log(`ID: ${id} \n updatedItem: ${updatedItem}`)
-      firestore().collection("list").doc(id).update(updatedItem)
+    updateItem(state, payload) {
+      firestore().collection("list").doc(payload.id).update(payload)
         .then(function () {
           console.log('Updated')
         })
