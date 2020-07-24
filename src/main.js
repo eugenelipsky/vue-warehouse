@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import App from './App.vue'
-import vuetify from '@/plugins/vuetify'
 import router from './router'
 import store from './store'
 import './registerServiceWorker'
@@ -9,8 +8,11 @@ import 'materialize-css/dist/js/materialize.min'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
+import dateFilter from "./filters/date.filter";
 
 Vue.config.productionTip = false
+
+Vue.filter('date', dateFilter)
 
 // Initialize Firebase
 firebase.initializeApp({
@@ -22,6 +24,16 @@ firebase.initializeApp({
   messagingSenderId: "419793063147",
   appId: "1:419793063147:web:58352aa868bf7f71e942ae"
 });
+
+firebase.getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+      unsubscribe();
+      resolve(user);
+    }, reject);
+  })
+};
+
 
 new Vue({
   router,

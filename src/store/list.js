@@ -1,39 +1,49 @@
-import {firestore} from "firebase";
+import firebase, {firestore} from "firebase";
 
 export default {
   actions: {
-    async setItems({state, commit}) {
-      await firestore().collection("list")
+    async setItems({commit}) {
+      await firestore().collection("users")
+        .doc(`${firebase.auth().currentUser.uid}`)
+        .collection('list')
         .onSnapshot(function (querySnapshot) {
           let list = [];
-          console.log(querySnapshot)
           querySnapshot.forEach(function (doc) {
-            console.log(doc)
-            list.push(doc.data());
+            list.push(doc.data())
           })
           commit('setStoreItems', list)
+
         })
     }
   },
   mutations: {
     async addItem(state, newItem) {
       try {
-        let db = firestore();
-        await db.collection('list').doc(`${newItem.id}`).set(newItem)
-        console.log(state.list)
+        const db = firestore();
+        await db.collection('users')
+          .doc(`${firebase.auth().currentUser.uid}`)
+          .collection('list')
+          .doc(`${newItem.id}`)
+          .set(newItem)
       } catch (e) {
         throw Error(e)
       }
-
     },
-    deleteItem(state, id) {
-      firestore().collection("list").doc(id).delete().then(function () {
+    async deleteItem(state, id) {
+      await firestore().collection('users')
+        .doc(`${firebase.auth().currentUser.uid}`)
+        .collection('list')
+        .doc(id)
+        .delete().then(function () {
         state.list = state.list.filter(item => item.id !== id);
         console.log(state.list)
       })
     },
     updateItem(state, payload) {
-      firestore().collection("list").doc(payload.id).update(payload)
+      firestore().collection('users')
+        .doc(`${firebase.auth().currentUser.uid}`)
+        .collection('list')
+        .doc(payload.id).update(payload)
         .then(function () {
           console.log('Updated')
         })
@@ -43,6 +53,9 @@ export default {
     },
     setStoreItems(state, items) {
       state.list = items;
+    },
+    clearStore(state) {
+      state.list = [];
     }
   },
   state: {
