@@ -1,7 +1,10 @@
 <template>
   <nav class="nav-extended">
     <div class="nav-wrapper">
-      <a href="#!" class="brand-logo">Warehouse</a>
+      <router-link to="/" class="brand-logo">Warehouse</router-link>
+<!--      <a href="#" class="sidebar-trigger">-->
+<!--        <i class="material-icons">menu</i>-->
+<!--      </a>-->
       <ul class="right hide-on-med-and-down">
         <router-link to="/"
                      exact
@@ -26,14 +29,8 @@
   </nav>
 </template>
 <script>
-  import * as firebase from "firebase";
-  import {mapActions} from "vuex";
-
   export default {
-    name: 'navbar',
-    data: () => ({
-
-    })
+    name: 'navbar'
   }
 </script>
 <style scoped>

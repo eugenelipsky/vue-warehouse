@@ -6,9 +6,9 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col s4 m4 cards">
-        <div class="card" v-for="product of getAllListItems">
+    <div class="row" v-if="getAllListItems.length">
+      <div class="col s4 m4 cards" >
+        <div class="card" v-for="product of getAllListItems" >
           <div class="card-image">
             <img class="product__img" :src="product.photoUrl">
             <a class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
@@ -19,6 +19,11 @@
             <p>{{product.description}}</p>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="row" v-else>
+      <div class="col">
+        <p class="no_products">Здесь пока нет товаров</p>
       </div>
     </div>
   </div>
@@ -69,5 +74,10 @@
     display: grid;
     grid-template-columns: repeat(4, 300px);
     grid-gap: 20px;
+  }
+
+  .no_products {
+    font-size: 15px;
+    text-decoration: underline;
   }
 </style>

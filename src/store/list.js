@@ -1,4 +1,4 @@
-import firebase, {firestore} from "firebase";
+import firebase, {firestore} from "firebase/app";
 
 export default {
   actions: {
