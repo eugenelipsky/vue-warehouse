@@ -36,6 +36,14 @@ const routes = [
     meta: {
       hideForAuth: true
     }
+  },
+  {
+    path: '/app',
+    name: 'App',
+    component: () => import('../App'),
+    meta: {
+      hideForAuth: true
+    }
   }
 ]
 

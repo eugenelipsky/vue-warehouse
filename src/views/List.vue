@@ -1,155 +1,187 @@
 <template>
-  <div class="app">
-    <div class="container">
-      <div class="col">
-        <div class="row app_top">
-          <div class="input-field col s8">
-            <input id="search_input" type="text" class="validate" autocomplete="off" v-model="search">
-            <label for="search_input">Поиск</label>
-            <span class="helper-text" data-success="Поиск выполнен">Введите название товара</span>
-          </div>
-
-          <div class="col s4">
-            <div class="input-field col s12">
-              <select ref="select" v-model="select">
-                <option value="ALPH">По алфавиту</option>
-                <option value="DATE_NEW">По дате добавления</option>
-                <option value="ASC">Цены по возрастанию</option>
-                <option value="DESC">Цены по убыванию</option>
-              </select>
-              <label>Сортировка</label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
+  <div>
+    <v-card class="mb-4">
+      <v-row class="mx-auto m4" cols="12" sm="12">
+        <v-col class="mx-auto m4" cols="12" sm="9" md="9">
+          <v-text-field v-model="search"
+                        flat
+                        hide-details
+                        label="Поиск"
+                        prepend-inner-icon="mdi-magnify"
+                        solo-inverted></v-text-field>
+        </v-col>
+        <v-col class="mx-auto m4" cols="12" sm="3" md="3">
+          <v-select v-model="select"
+                    :items="selectItems"
+                    flat
+                    hide-details
+                    solo-inverted
+                    label="Сортировка"
+          ></v-select>
+        </v-col>
+      </v-row>
+    </v-card>
+    <v-row>
+      <v-col>
         <p>Всего товаров: <strong>{{getAllListItems.length}}</strong></p>
-      </div>
-      <table class="striped" v-if="getAllListItems.length">
-        <thead>
-        <tr>
-          <th>Название</th>
-          <th>Фото</th>
-          <th>Описание</th>
-          <th>Цена</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(item, index) of filteredList" :key="item.id"
+      </v-col>
+    </v-row>
+    <v-card
+      v-if="getAllListItems.length"
+      class="mx-auto">
+      <v-list three-line>
+        <template v-for="(item, index) of filteredList">
+          <v-list-item
+            :key="item.id"
             @mouseover="rowIndex = index"
             @mouseleave="rowIndex = -1"
-        >
-          <td>
-            <span v-show="item.id !== editedItem">{{`${index + 1}. ${item.title}`}}</span>
-            <input type="text" v-model="item.title" v-show="item.id === editedItem">
-          </td>
-          <td>
-            <img class="product__img" :src="item.photoUrl" v-show="item.id !== editedItem">
-            <div class="file-field input-field s3" v-show="item.id === editedItem">
-              <div class="btn">
-                <span>Фото</span>
-                <input type="file" @change="onFileSelected">
-              </div>
-              <div class="file-path-wrapper">
-                <input class="file-path validate" type="text" ref="uploaded_filename">
-              </div>
-              <span v-show="showProgress">{{uploadProgress}}%</span>
-              <div class="progress" v-show="showProgress">
-                <div class="determinate"
-                     :style="{width: uploadProgress + '%'}"
-                     :aria-valuenow="uploadProgress"
-                     aria-valuemin="0"
-                     aria-valuemax="100">
-                </div>
-              </div>
-            </div>
-          </td>
-          <td>
-            <span v-show="item.id !== editedItem">{{item.description}}</span>
-            <input type="text" v-model="item.description" v-show="item.id === editedItem">
-          </td>
-          <td>
-            <span v-show="item.id !== editedItem">{{`${item.price}$`}}</span>
-            <input type="number" v-model="item.price" v-show="item.id === editedItem">
-          </td>
-          <td>
+            @click=""
+            :ripple="false">
+            <v-list-item-avatar>
+              <v-img class="product_image" :src="item.photoUrl"></v-img>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title v-html="item.title" v-show="item.id !== editedItem"></v-list-item-title>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="item.title"
+                  v-show="item.id === editedItem"
+                  label="Название"
+                  single-line
+                  solo
+                ></v-text-field>
+              </v-col>
+              <v-list-item-subtitle v-html="item.description" v-show="item.id !== editedItem"></v-list-item-subtitle>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="item.description"
+                  v-show="item.id === editedItem"
+                  label="Описание"
+                  single-line
+                  solo
+                ></v-text-field>
+              </v-col>
+            </v-list-item-content>
+            <v-list-item-content>
+              <v-list-item-title v-html="item.price + '$'" v-show="item.id !== editedItem"></v-list-item-title>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="item.price"
+                  v-show="item.id === editedItem"
+                  label="Цена"
+                  single-line
+                  solo
+                ></v-text-field>
+              </v-col>
+            </v-list-item-content>
             <div class="datetime" v-show="true">
               <span>{{item.date | date('datetime')}}</span>
             </div>
-            <div class="controls_column" v-show="rowIndex === index">
-              <i class="material-icons right icon_delete"
-                 @click="deleteItem(item.id)">delete</i>
-              <i class="material-icons right icon_edit"
-                 @click="editItem(item.id)"
-                 v-show="item.id !== editedItem">edit</i>
-              <i class="material-icons right icon_save"
-                 @click="saveItemEdit({
-               id: item.id,
-               title: item.title,
-               description: item.description,
-               price: item.price,
-               date: new Date().getTime(),
-               photoUrl: item.photoUrl})"
-                 v-show="item.id === editedItem">save</i>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <p v-else>Вы еще не добавили товаров</p>
-      <div class="fixed__action-btn">
-        <a href="#modal1" class="btn-floating btn-large halfway-fab waves-effect waves-light teal modal-trigger">
-          <i class="material-icons">add</i>
-        </a>
-      </div>
-      <!-- Edit Structure -->
-      <!-- Modal 1 Structure -->
-      <div id="modal1" class="modal bottom-sheet" ref="modal">
-        <form @submit.prevent="submitHandler">
-          <div class="modal-content">
-            <div class="col s12">
-              <div class="row modal_row">
-                <div class="input-field col s3">
-                  <input id="title" type="text" autocomplete="off" class="validate" v-model="title">
-                  <label for="title">Название</label>
-                </div>
-                <div class="input-field col s3">
-                  <input id="description" type="text" autocomplete="off" class="validate" v-model="description">
-                  <label for="description">Описание</label>
-                </div>
-                <div class="input-field col s3">
-                  <input id="descr" type="text" autocomplete="off" class="validate" v-model="price">
-                  <label for="descr">Цена</label>
-                </div>
-                <div class="file-field input-field s3">
-                  <div class="btn">
-                    <span>Фото</span>
-                    <input type="file" @change="onFileSelected">
-                  </div>
-                  <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text" ref="uploaded_filename">
-                  </div>
-                  <span v-show="showProgress">{{uploadProgress}}%</span>
-                  <div class="progress" v-show="showProgress">
-                    <div class="determinate"
-                         :style="{width: uploadProgress + '%'}"
-                         :aria-valuenow="uploadProgress"
-                         aria-valuemin="0"
-                         aria-valuemax="100">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="waves-effect waves-green btn-flat">Добавить товар</button>
-            <a href="#!" class="modal-close waves-effect waves-red btn-flat">Закрыть</a>
-          </div>
-        </form>
-      </div>
-    </div>
+            <v-list-item-action v-show="rowIndex === index">
+              <v-btn v-on:click="editItem(item.id)" v-show="item.id !== editedItem" icon>
+                <v-icon color="grey lighten-1">mdi-circle-edit-outline</v-icon>
+              </v-btn>
+              <v-btn v-on:click="saveItemEdit({
+                           id: item.id,
+                           title: item.title,
+                           description: item.description,
+                           price: item.price,
+                           date: new Date().getTime(),
+                           photoUrl: item.photoUrl})"
+                     v-show="item.id === editedItem"
+                     icon>
+                <v-icon color="grey lighten-1">mdi-content-save</v-icon>
+              </v-btn>
+              <v-btn v-on:click="deleteItem(item.id)" v-show="item.id !== editedItem" icon>
+                <v-icon color="grey lighten-1">mdi-delete</v-icon>
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+          <v-divider></v-divider>
+        </template>
+      </v-list>
+    </v-card>
+    <v-row v-else>
+      <v-col>
+        <p>Вы еще не добавили товаров</p>
+      </v-col>
+    </v-row>
+    <v-btn style="z-index: 9999"
+           @click="sheet = !sheet"
+           color="success"
+           v-bind="attrs"
+           v-on="on"
+           dark
+           fixed
+           top
+           right
+           fab>
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
+    <v-bottom-sheet v-model="sheet">
+      <v-sheet class="text-center" >
+        <v-card>
+          <form @submit.prevent="submitHandler" id="add-product-form">
+            <v-card-title class="headline">Добавить товар</v-card-title>
+            <v-container>
+              <v-row>
+                <v-col
+                  cols="12"
+                  md="6">
+                  <v-text-field
+                    v-model="title"
+                    label="Название"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="6">
+                  <v-text-field
+                    v-model="price"
+                    type="number"
+                    label="Цена"
+                    required
+                  ></v-text-field>
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="12"
+                >
+                  <v-text-field
+                    v-model="description"
+                    label="Описание"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="12">
+                  <v-file-input show-size accept="image/*" label="Фото товара" v-model="selectedFile"></v-file-input>
+                  <v-progress-linear
+                    v-show="showProgress"
+                    v-model="uploadProgress"
+                    color="blue-grey"
+                    height="25"
+                  >
+                    <template v-slot="{ value }">
+                      <strong>{{ Math.ceil(value) }}%</strong>
+                    </template>
+                  </v-progress-linear>
+                </v-col>
+              </v-row>
+            </v-container>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn type="submit" form="add-product-form" color="green darken-1" text>Добавить товар</v-btn>
+              <v-btn color="red darken-1" text @click="sheet = !sheet">Закрыть</v-btn>
+            </v-card-actions>
+          </form>
+        </v-card>
+      </v-sheet>
+    </v-bottom-sheet>
   </div>
 </template>
 
@@ -163,7 +195,7 @@
       ...mapGetters(['getAllListItems']),
       filteredList() {
         let searchList = this.getAllListItems.filter(product => {
-          return product.title.toLowerCase().includes(this.search.toLowerCase())
+          return product.title.toLowerCase().includes(this.search.toLowerCase().trim())
         })
         if (this.select === 'DATE_NEW') {
           return searchList.sort((a, b) => (a.date > b.date) ? 1 : -1)
@@ -182,7 +214,8 @@
       }
     },
     data: () => ({
-      select: 'ALPH',
+      select: ['DATE_NOW', 'ALPH', 'ASC', 'DESC'],
+      selectItems: ['По алфавиту', 'По дате добавления', 'Цены по возрастанию', 'Цены по убыванию'],
       title: '',
       description: '',
       price: null,
@@ -193,10 +226,10 @@
       uploadProgress: 0,
       showProgress: false,
       search: '',
+      drawer: null,
+      sheet: false
     }),
     mounted() {
-      this.select = M.FormSelect.init(this.$refs.select, {})
-      M.Modal.init(this.$refs.modal, null);
       this.select = 'ALPH';
       this.$store.dispatch('setItems')
     },
@@ -231,8 +264,8 @@
                 photoUrl: this.photoUrl
               });
             }
-            e.target.reset()
             this.title = this.description = this.price = '';
+            this.selectedFile = null
             this.uploadProgress = 0;
             this.showProgress = false;
           })
@@ -245,71 +278,12 @@
         this.updateItem(payload);
         this.editedItem = false;
       },
-      onFileSelected(event) {
-        return this.selectedFile = event.target.files[0];
-      }
+
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  td {
-    max-width: 700px;
-    min-width: 190px;
-    word-break: break-word;
-    position: relative;
-  }
-
-  tr {
-    height: 70px;
-  }
-
-  .app_top {
-    margin-top: 20px;
-  }
-
-  .fixed__action-btn {
-    position: fixed;
-    right: 15px;
-    bottom: 23px;
-    z-index: 999;
-    padding-top: 15px;
-    margin-bottom: 30px;
-  }
-
-  .teal {
-    background-color: rgba(66, 178, 198, 0.8) !important;
-  }
-
-  .edit-btn {
-    margin-left: 15px;
-  }
-
-  .controls_column {
-    margin-right: auto;
-  }
-
-  .product__img {
-    width: 80px;
-  }
-
-  .icon_delete, .icon_edit, .icon_save {
-    color: #888;
-    cursor: pointer;
-  }
-
-  .icon_delete:hover {
-    color: tomato;
-  }
-
-  .icon_edit:hover {
-    color: cadetblue;
-  }
-
-  .icon_save:hover {
-    color: forestgreen;
-  }
-
   .datetime {
     position: absolute;
     top: 0;
@@ -318,14 +292,5 @@
     color: #888;
   }
 
-  .container {
-    width: 90%;
-  }
-
-  .modal_row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
+  $list-item-two-line-min-height: 80px !default;
 </style>
