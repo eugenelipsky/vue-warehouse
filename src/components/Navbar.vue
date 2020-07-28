@@ -1,32 +1,29 @@
 <template>
-  <nav class="nav-extended">
-    <div class="nav-wrapper">
-      <router-link to="/" class="brand-logo">Warehouse</router-link>
-<!--      <a href="#" class="sidebar-trigger">-->
-<!--        <i class="material-icons">menu</i>-->
-<!--      </a>-->
-      <ul class="right hide-on-med-and-down">
-        <router-link to="/"
-                     exact
-                     tag="li"
-                     active-class="active">
-          <a href="#">Главная</a>
-        </router-link>
-        <router-link to="/list"
-                     exact
-                     tag="li"
-                     active-class="active">
-          <a href="#">Список товаров</a>
-        </router-link>
-        <router-link to="/profile"
-                     exact
-                     tag="li"
-                     active-class="active">
-          <a href="#">Профиль</a>
-        </router-link>
-      </ul>
-    </div>
-  </nav>
+    <nav class="nav-extended">
+      <div class="nav-wrapper">
+        <router-link to="/" class="brand-logo">Warehouse</router-link>
+        <ul class="right hide-on-med-and-down">
+          <router-link to="/"
+                       exact
+                       tag="li"
+                       active-class="active">
+            <a href="#">Главная</a>
+          </router-link>
+          <router-link to="/list"
+                       exact
+                       tag="li"
+                       active-class="active">
+            <a href="#">Список товаров</a>
+          </router-link>
+          <router-link to="/profile"
+                       exact
+                       tag="li"
+                       active-class="active">
+            <a href="#">Профиль</a>
+          </router-link>
+        </ul>
+      </div>
+    </nav>
 </template>
 <script>
   export default {
@@ -34,8 +31,6 @@
   }
 </script>
 <style scoped>
-
-
   nav {
     background-color: rgba(66, 178, 198, 0.8);
   }
