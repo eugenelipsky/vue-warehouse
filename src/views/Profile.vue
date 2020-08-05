@@ -3,7 +3,6 @@
     <v-card
       color="blue-grey darken-1"
       dark
-      :loading="isUpdating"
     >
       <template v-slot:progress>
         <v-progress-linear
@@ -31,7 +30,7 @@
           >
             <v-col class="text-center">
               <h3 class="headline">{{ name }}</h3>
-              <span class="grey--text text--lighten-1">{{ title }}</span>
+              <span class="grey--text text--lighten-1">{{ email }}</span>
             </v-col>
           </v-row>
         </v-row>
@@ -45,7 +44,6 @@
             >
               <v-text-field
                 v-model="name"
-                :disabled="isUpdating"
                 filled
                 color="blue-grey lighten-2"
                 label="Имя"
@@ -57,7 +55,6 @@
             >
               <v-text-field
                 v-model="email"
-                :disabled="isUpdating"
                 filled
                 color="blue-grey lighten-2"
                 label="Email"
@@ -70,8 +67,6 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          :disabled="autoUpdate"
-          :loading="isUpdating"
           color="blue-grey darken-3"
           depressed
           @click="snackbar = true"
@@ -87,11 +82,10 @@
     >
       Пока не работает.
 
-      <template v-slot:action="{ attrs }">
+      <template>
         <v-btn
           color="blue"
           text
-          v-bind="attrs"
           @click="snackbar = false"
         >
           Закрыть

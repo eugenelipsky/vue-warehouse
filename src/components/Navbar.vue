@@ -38,6 +38,14 @@
           <v-list-item-title>Товары</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+      <v-list-item link to="/groups">
+        <v-list-item-action>
+          <v-icon>mdi-account-group</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>Группы</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
     <template v-slot:append>
       <div class="pa-2">

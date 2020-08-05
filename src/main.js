@@ -15,7 +15,6 @@ Vue.config.productionTip = false
 
 Vue.filter('date', dateFilter)
 
-
 // Initialize Firebase
 firebase.initializeApp({
   apiKey: "AIzaSyDDDlYhYAGO5HkgJIA1aZG5EO2yjxsn5XU",

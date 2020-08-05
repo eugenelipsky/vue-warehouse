@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import * as firebase from "firebase";
+import * as firebase from "firebase/app";
+import GroupInfo from '../views/GroupInfo';
+import GroupsList from '../views/GroupsList';
+import GroupMembers from '../views/GroupMembers';
+import GroupEdit from '../views/GroupEdit';
 
 Vue.use(VueRouter)
 
@@ -28,6 +32,33 @@ const routes = [
     meta: {
       requiresAuth: true
     }
+  },
+  {
+    path: '/groups',
+    name: 'Groups',
+    component: () => import('../views/Groups'),
+    meta: {
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: '',
+        name: 'GroupList',
+        component: GroupsList
+      },
+      {
+        path: ':id/group-info',
+        component: GroupInfo
+      },
+      {
+        path: ':id/group-members',
+        component: GroupMembers
+      },
+      {
+        path: ':id/group-edit',
+        component: GroupEdit
+      }
+    ]
   },
   {
     path: '/login',

@@ -13,11 +13,14 @@
         <v-col class="mx-auto m4" cols="12" sm="3" md="3">
           <v-select v-model="select"
                     :items="selectItems"
+                    item-value="abbr"
+                    item-text="name"
                     flat
                     hide-details
                     solo-inverted
                     label="Сортировка"
-          ></v-select>
+          >
+          </v-select>
         </v-col>
       </v-row>
     </v-card>
@@ -42,39 +45,45 @@
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title v-html="item.title" v-show="item.id !== editedItem"></v-list-item-title>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="item.title"
-                  v-show="item.id === editedItem"
-                  label="Название"
-                  single-line
-                  solo
-                ></v-text-field>
-              </v-col>
+              <v-row class="mx-auto m4" cols="12" sm="12">
+                <v-col class="mx-auto" cols="12" sm="12">
+                  <v-text-field
+                    v-model="item.title"
+                    v-show="item.id === editedItem"
+                    label="Название"
+                    single-line
+                    solo
+                  ></v-text-field>
+                </v-col>
+              </v-row>
               <v-list-item-subtitle v-html="item.description" v-show="item.id !== editedItem"></v-list-item-subtitle>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="item.description"
-                  v-show="item.id === editedItem"
-                  label="Описание"
-                  single-line
-                  solo
-                ></v-text-field>
-              </v-col>
+              <v-row class="mx-auto m4" cols="12" sm="12">
+                <v-col class="mx-auto m4" cols="12" sm="12">
+                  <v-text-field
+                    v-model="item.description"
+                    v-show="item.id === editedItem"
+                    label="Описание"
+                    single-line
+                    solo
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row class="mx-auto m4" cols="12" sm="12">
+                <v-col class="mx-auto m4" cols="12" sm="12">
+                  <v-text-field
+                    v-model="item.price"
+                    v-show="item.id === editedItem"
+                    label="Цена"
+                    single-line
+                    solo
+                  ></v-text-field>
+                </v-col>
+              </v-row>
             </v-list-item-content>
-            <v-list-item-content>
+            <v-list-item-content v-show="item.id !== editedItem">
               <v-list-item-title v-html="item.price + '$'" v-show="item.id !== editedItem"></v-list-item-title>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="item.price"
-                  v-show="item.id === editedItem"
-                  label="Цена"
-                  single-line
-                  solo
-                ></v-text-field>
-              </v-col>
             </v-list-item-content>
-            <div class="datetime" v-show="true">
+            <div class="datetime" v-show="item.id !== editedItem">
               <span>{{item.date | date('datetime')}}</span>
             </div>
             <v-list-item-action v-show="rowIndex === index">
@@ -109,8 +118,6 @@
     <v-btn style="z-index: 9999"
            @click="sheet = !sheet"
            color="success"
-           v-bind="attrs"
-           v-on="on"
            dark
            fixed
            top
@@ -119,7 +126,7 @@
       <v-icon>mdi-plus</v-icon>
     </v-btn>
     <v-bottom-sheet v-model="sheet">
-      <v-sheet class="text-center" >
+      <v-sheet class="text-center">
         <v-card>
           <form @submit.prevent="submitHandler" id="add-product-form">
             <v-card-title class="headline">Добавить товар</v-card-title>
@@ -159,7 +166,12 @@
                 <v-col
                   cols="12"
                   md="12">
-                  <v-file-input show-size accept="image/*" label="Фото товара" v-model="selectedFile"></v-file-input>
+                  <v-file-input show-size
+                                :rules="rules"
+                                required
+                                accept="image/*"
+                                label="Фото товара"
+                                v-model="selectedFile"></v-file-input>
                   <v-progress-linear
                     v-show="showProgress"
                     v-model="uploadProgress"
@@ -187,7 +199,7 @@
 
 <script>
   import {mapGetters, mapMutations} from 'vuex';
-  import firebase from 'firebase/app'
+  import firebase from 'firebase'
 
   export default {
     name: "List",
@@ -197,12 +209,12 @@
         let searchList = this.getAllListItems.filter(product => {
           return product.title.toLowerCase().includes(this.search.toLowerCase().trim())
         })
-        if (this.select === 'DATE_NEW') {
-          return searchList.sort((a, b) => (a.date > b.date) ? 1 : -1)
-        }
-        if (this.select === 'ALPH') {
-          return searchList.sort((a, b) => (a.title.toLowerCase() > b.title.toLowerCase()) ? 1 : -1)
-        }
+        // if (this.select === 'DATE_NEW') {
+        //   return searchList.sort((a, b) => (a.date > b.date) ? 1 : -1)
+        // }
+        // if (this.select === 'ALPH') {
+        //   return searchList.sort((a, b) => (a.title.localeCompare(b.title)))
+        // }
         if (this.select === 'ASC') {
           return searchList.sort((a, b) => (Number(a.price) > Number(b.price)) ? 1 : -1)
         }
@@ -214,8 +226,13 @@
       }
     },
     data: () => ({
-      select: ['DATE_NOW', 'ALPH', 'ASC', 'DESC'],
-      selectItems: ['По алфавиту', 'По дате добавления', 'Цены по возрастанию', 'Цены по убыванию'],
+      select: ['ASC', 'DESC'],
+      selectItems: [
+        // {name: 'По алфавиту', abbr: 'DATE_NOW'},
+        // {name: 'По дате добавления', abbr: 'ALPH'},
+        {name: 'Цены по возрастанию', abbr: 'ASC'},
+        {name: 'Цены по убыванию', abbr: 'DESC'},
+      ],
       title: '',
       description: '',
       price: null,
@@ -226,11 +243,12 @@
       uploadProgress: 0,
       showProgress: false,
       search: '',
-      drawer: null,
-      sheet: false
+      drawer: false,
+      sheet: false,
+      rules: [
+        v => !!v || 'Это поле обязательное']
     }),
     mounted() {
-      this.select = 'ALPH';
       this.$store.dispatch('setItems')
     },
 
