@@ -7,7 +7,9 @@
       <v-list-item
         v-for="user in getUsers"
         :key="user.uid"
-        :ripple="false">
+        :ripple="false"
+        v-if="owner !== user.uid"
+      >
         <v-list-item-avatar>
           <v-img :src="user.photo"></v-img>
         </v-list-item-avatar>
@@ -16,8 +18,7 @@
           <v-list-item-title v-text="user.name"></v-list-item-title>
         </v-list-item-content>
 
-        <v-list-item-icon
-        >
+        <v-list-item-icon>
           <v-btn
             v-if="!membersContains.includes(user.uid)"
             @click="addGroupMember(user.uid)">
@@ -46,12 +47,18 @@ export default {
   data: () => ({
     members: null,
     addedMember: '',
+    owner: ''
   }),
   computed: {
-    ...mapGetters(['getUsers', 'getGroupMembers']),
+    ...mapGetters(['getUsers', 'getGroupMembers', 'getGroups', 'getUserGroups']),
     membersContains() {
       return this.getGroupMembers.map(member => {
         return member.id
+      })
+    },
+    ownerContains() {
+      return this.getGroups.map(group => {
+        this.owner = group.owner
       })
     }
   },
@@ -69,9 +76,11 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('setUsers')
+    this.$store.dispatch('setGroups')
     this.setMembers(this.$route.params.id)
-    console.log(this.membersContains)
+    console.log('SUKA', this.ownerContains)
+    console.log('BLYAT', this.membersContains)
+    console.log(this.owner)
   }
 }
 </script>

@@ -81,7 +81,7 @@
       ...mapActions(['logout']),
       socialSignOut() {
         this.logout().then((res) => {
-          this.$router.replace('login')
+          this.$router.replace('/login')
         })
       }
     },

@@ -55,8 +55,10 @@ export default {
       this.getUserGroups.filter(user => {
         this.getGroups.filter(group => {
           if (group.id === user.groupId && user.memberId === firebase.auth().currentUser.uid || group.owner === firebase.auth().currentUser.uid) {
-            console.log(group)
-            groups.push(group)
+            if (groups.includes(group)) {
+              return groups
+            } else
+              groups.push(group)
           }
         })
       })
@@ -64,8 +66,6 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch('setItems');
-    this.$store.dispatch('setUsersGroups');
   },
 }
 </script>

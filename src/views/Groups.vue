@@ -64,7 +64,7 @@
 </template>
 
 <script>
-  import {mapGetters, mapMutations} from 'vuex';
+  import {mapMutations} from 'vuex';
   import firebase from 'firebase/app'
 
   export default {
@@ -80,7 +80,8 @@
       this.$store.dispatch('setGroups')
       this.$store.dispatch('setItems')
       this.$store.dispatch('setUsers')
-      this.$store.dispatch('setUsersGroups');
+      this.$store.dispatch('setUsersGroups')
+      this.$store.dispatch('setMembers')
     },
     methods: {
       ...mapMutations(['addGroup']),
@@ -103,11 +104,5 @@
 </script>
 
 <style scoped>
-  #create .v-speed-dial {
-    position: absolute;
-  }
 
-  #create .v-btn--floating {
-    position: relative;
-  }
 </style>
