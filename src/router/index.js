@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '@/store'
 import * as firebase from "firebase/app";
 import GroupInfo from '../views/GroupInfo';
 import GroupsList from '../views/GroupsList';
 import GroupMembers from '../views/GroupMembers';
 import GroupEdit from '../views/GroupEdit';
+import GroupAdmins from '@/views/GroupAdmins';
 
 Vue.use(VueRouter)
+
 
 const routes = [
   {
@@ -52,12 +55,26 @@ const routes = [
       },
       {
         path: ':id/group-members',
-        component: GroupMembers
+        component: GroupMembers,
+        meta: {
+          hideForNonAdmins: true
+        }
+      },
+      {
+        path: ':id/group-members/admins',
+        component: GroupAdmins,
+        meta: {
+          hideForNonAdmins: true
+        }
       },
       {
         path: ':id/group-edit',
-        component: GroupEdit
-      }
+        component: GroupEdit,
+        meta: {
+          hideForNonAdmins: true
+        }
+      },
+
     ]
   },
   {
@@ -88,14 +105,26 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const hideForAuth = to.matched.some(record => record.meta.hideForAuth);
+  const hideForNonAdmins = to.matched.some(record => record.meta.hideForNonAdmins);
 
   if (requiresAuth && !await firebase.getCurrentUser()) {
     next('login');
   } else if (hideForAuth && await firebase.getCurrentUser()) {
     next('/');
+  } else if (hideForNonAdmins) {
+     store.state.groups.groups.forEach(group => {
+      if (window.location.pathname.includes(group.id)) {
+        if (group.owner !== firebase.auth().currentUser.uid) {
+          next('/groups')
+        } else {
+          next()
+        }
+      }
+    })
   } else {
-    next();
+    next()
   }
-});
+})
+
 
 export default router

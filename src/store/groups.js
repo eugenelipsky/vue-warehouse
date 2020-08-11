@@ -122,6 +122,13 @@ export default {
           console.log(state.members)
         })
     },
+    async setAdministrator(state, info) {
+      await firestore().collection('groups')
+        .doc(`${info.route}`)
+        .update({
+          owner: info.id
+        })
+    },
     setStoreGroups(state, groups) {
       state.groups = groups;
     },
@@ -130,6 +137,9 @@ export default {
     },
     setGroupMembers(state, members) {
       state.members = members
+    },
+    clearGroupProducts(state) {
+      state.productList = []
     }
   },
   getters: {
@@ -141,6 +151,11 @@ export default {
     },
     getGroupMembers(state) {
       return state.members
+    },
+    getGroupOwners(state) {
+      return state.groups.forEach(group => {
+        return group.owner;
+      })
     }
   }
 }

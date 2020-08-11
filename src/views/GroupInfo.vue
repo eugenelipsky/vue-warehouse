@@ -1,5 +1,25 @@
 <template>
   <div>
+    <BackButton />
+    <v-alert
+      class="mt-3"
+      prominent
+      type="error"
+      v-show="adminAlert"
+    >
+      <v-row align="center">
+        <v-col class="grow">
+          Вы не можете покинуть группу, так как являетесь администратором.
+          Перейдите в настройки и передайте права администоратора другому пользователю, перед тем как покинуть группу.
+        </v-col>
+        <v-col class="shrink">
+          <v-btn
+            :to="({ path: `/groups/${$route.params.id}/group-members/admins`})"
+            @click="adminAlert = false"
+          >Назначить администратора</v-btn>
+        </v-col>
+      </v-row>
+    </v-alert>
     <v-speed-dial
       v-model="fab"
       style="z-index: 9999"
@@ -71,6 +91,7 @@
               dark
               small
               color="red"
+              @click="groupOwner ? adminAlert = true : leaveGroup($route.params.id)"
             >
               Покинуть группу
             </v-btn>
@@ -237,9 +258,13 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from 'vuex';
 import firebase from 'firebase';
+import BackButton from '@/components/BackButton'
 
 export default {
   name: "GroupInfo",
+  components: {
+    BackButton
+  },
   data: () => ({
     fab: false,
     title: '',
@@ -252,7 +277,8 @@ export default {
     sheet: false,
     rules: [v => !!v || 'Это поле обязательное'],
     editMode: false,
-    groupOwner: null
+    groupOwner: null,
+    adminAlert: false
   }),
   computed: {
     ...mapGetters(['getGroups', 'getProducts', 'getGroupMembers']),
@@ -267,8 +293,11 @@ export default {
     this.ownerContains()
     console.log(this.groupOwner)
   },
+  beforeDestroy() {
+    this.clearGroupProducts()
+  },
   methods: {
-    ...mapMutations(['addGroupProduct', 'deleteProduct', 'updateProduct']),
+    ...mapMutations(['addGroupProduct', 'deleteProduct', 'updateProduct', 'deleteMember', 'clearGroupProducts']),
     ...mapActions(['setProducts', 'setMembers']),
     uniqueID() {
       return '_' + Math.random().toString(36).substr(2, 9);
@@ -316,8 +345,12 @@ export default {
           this.groupOwner = group.owner === firebase.auth().currentUser.uid
         }
       })
+    },
+    leaveGroup(groupId) {
+      this.deleteMember({groupId, id: firebase.auth().currentUser.uid})
+      this.$router.push('/groups')
     }
-  }
+  },
 }
 </script>
 

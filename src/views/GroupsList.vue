@@ -10,6 +10,7 @@
         >
           <v-card
             max-width="344"
+            :to="({ path: `/groups/${group.id}/group-info`})"
           >
             <v-img
               src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
@@ -24,16 +25,16 @@
               {{ group.description }}
             </v-card-subtitle>
 
-            <v-card-actions>
-              <v-btn
-                color="purple"
-                text
-                :to="({ path: `/groups/${group.id}/group-info`})"
-              >
-                Войти
-              </v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
+<!--            <v-card-actions>-->
+<!--              <v-btn-->
+<!--                color="purple"-->
+<!--                text-->
+<!--                :to="({ path: `/groups/${group.id}/group-info`})"-->
+<!--              >-->
+<!--                Войти-->
+<!--              </v-btn>-->
+<!--              <v-spacer></v-spacer>-->
+<!--            </v-card-actions>-->
           </v-card>
         </v-col>
       </v-row>
@@ -48,6 +49,9 @@ import * as firebase from 'firebase';
 export default {
   name: "GroupsList",
   methods: {},
+  watch: {
+    '$route': 'fetchData'
+  },
   computed: {
     ...mapGetters(['getGroups', 'getUsers', 'getUserGroups']),
     userGroups() {
